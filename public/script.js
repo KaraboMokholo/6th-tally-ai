@@ -276,13 +276,44 @@ setInterval(() => {
 // Google Login Placeholder (demo)
 // ────────────────────────────────────────────────
 function handleGoogleLogin(response) {
-    // This is called when user signs in
-    const data = JSON.parse(atob(response.credential.split('.')[1]));
-    document.getElementById('username').textContent = data.name || 'User';
-    document.getElementById('user-avatar').textContent = data.name?.[0] || '👤';
-    // In real app → send token to backend to save user/conversations
-    alert('Logged in as ' + data.name + ' (demo)');
+    try {
+        const data = JSON.parse(atob(response.credential.split('.')[1]));
+        
+        // Hide Google sign-in button
+        document.getElementById('google-signin-container').style.display = 'none';
+        
+        // Show logged-in profile with email
+        const profile = document.getElementById('logged-in-profile');
+        profile.style.display = 'flex';
+        
+        // Set name or first letter for avatar
+        const name = data.given_name || data.name || 'User';
+        document.getElementById('user-avatar').textContent = name.charAt(0) || '👤';
+        
+        // Show email
+        const email = data.email || 'user@gmail.com'; // fallback if email not present
+        document.getElementById('user-email').textContent = email;
+        
+        console.log('Logged in as:', name, email);
+        
+        // Optional: save to localStorage so it persists on refresh
+        localStorage.setItem('user', JSON.stringify({ name, email }));
+    } catch (err) {
+        console.error('Google login error:', err);
+    }
 }
+
+// Restore login state on page load
+window.addEventListener('load', () => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+        const { name, email } = JSON.parse(savedUser);
+        document.getElementById('google-signin-container').style.display = 'none';
+        document.getElementById('logged-in-profile').style.display = 'flex';
+        document.getElementById('user-avatar').textContent = name.charAt(0) || '👤';
+        document.getElementById('user-email').textContent = email;
+    }
+});
 
 // ────────────────────────────────────────────────
 // Share Conversation (demo - copy current URL)

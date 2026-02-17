@@ -122,6 +122,24 @@ body {
     gap: 12px;
 }
 
+.logged-in-text {
+    font-size: 14px;
+    color: var(--sidebar-text);
+    text-align: center;
+}
+
+#user-email {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Make avatar smaller when showing email */
+#logged-in-profile .avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+}
+
 /* Google Sign-In button styling */
 .g_id_signin {
     margin: 0 auto;

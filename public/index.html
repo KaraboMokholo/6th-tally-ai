@@ -21,30 +21,33 @@
             <div class="chat-history" id="chat-history"></div>
 
             <!-- Login / User profile at bottom of sidebar -->
-            <div class="user-profile">
-                <!-- Google Sign-In button (visible when not logged in) -->
-                <div id="google-signin-container">
-                    <div id="g_id_onload"
-     data-client_id="170635490413-hf334d5hkv2l42dqmveh85i711pg4a1m.apps.googleusercontent.com"
-     data-callback="handleGoogleLogin"
-     data-auto_prompt="false">
-</div>
-                    <div class="g_id_signin"
-                         data-type="standard"
-                         data-size="medium"
-                         data-theme="outline"
-                         data-text="continue_with"
-                         data-shape="pill"
-                         data-logo_alignment="left">
-                    </div>
-                </div>
+<!-- Sidebar bottom - Login / User profile -->
+<div class="user-profile">
+    <!-- Google Sign-In button - visible when NOT logged in -->
+    <div id="google-signin-container">
+        <div id="g_id_onload"
+             data-client_id="170635490413-hf334d5hkv2l42dqmveh85i711pg4a1m.apps.googleusercontent.com"
+             data-callback="handleGoogleLogin"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="medium"
+             data-theme="outline"
+             data-text="continue_with"
+             data-shape="pill"
+             data-logo_alignment="left">
+        </div>
+    </div>
 
-                <!-- Logged-in state (hidden by default) -->
-                <div id="logged-in-profile" style="display: none; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
-                    <div class="avatar" id="user-avatar">👤</div>
-                    <span class="username" id="username">User</span>
-                </div>
-            </div>
+    <!-- Logged-in state - hidden by default -->
+    <div id="logged-in-profile" style="display: none; align-items: center; gap: 10px; width: 100%; justify-content: center;">
+        <div class="avatar" id="user-avatar">👤</div>
+        <span class="logged-in-text">
+            Logged in as <strong id="user-email">user@gmail.com</strong>
+        </span>
+    </div>
+</div>
         </aside>
 
         <!-- Main Chat Area -->
