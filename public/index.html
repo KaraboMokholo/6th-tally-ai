@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6th Tally AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button id="new-chat-btn" class="new-chat-btn">+ New Chat</button>
+            </div>
+            <button id="close-sidebar" class="close-sidebar">×</button>
+            <div class="chat-history" id="chat-history">
+
+            </div>
+            <div class="user-profile">
+                <div class="avatar">👤</div>
+                <span class="username">Guest User</span>
+            </div>
+        </aside>
+
+
+        <main class="chat-area">
+            <header class="chat-header">
+                <h2>6th Tally AI</h2>
+                <button id="menu-toggle" class="menu-toggle">☰</button>
+            </header>
+
+            <div class="messages-container" id="chat-messages">
+
+            </div>
+
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Ask me anything..." rows="1"></textarea>
+                <button id="send-btn">Send</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
