@@ -1,38 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6th Tally AI</title>
+    <title>Lumy – South African AI</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="app">
 
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <button id="new-chat-btn" class="new-chat-btn">+ New Chat</button>
+                <button id="close-sidebar" class="close-sidebar">×</button>
             </div>
-            <button id="close-sidebar" class="close-sidebar">×</button>
-            <div class="chat-history" id="chat-history">
 
-            </div>
+            <div class="chat-history" id="chat-history"></div>
+
+            <!-- Login / User profile at bottom of sidebar -->
             <div class="user-profile">
-                <div class="avatar">👤</div>
-                <span class="username">Guest User</span>
+                <!-- Google Sign-In button (visible when not logged in) -->
+                <div id="google-signin-container">
+                    <div id="g_id_onload"
+                         data-client_id="AIzaSyAoCVbsIpYCNzuMcvrcfgHsfLmhiGjIfeo.apps.googleusercontent.com"
+                         data-callback="handleGoogleLogin"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-size="medium"
+                         data-theme="outline"
+                         data-text="continue_with"
+                         data-shape="pill"
+                         data-logo_alignment="left">
+                    </div>
+                </div>
+
+                <!-- Logged-in state (hidden by default) -->
+                <div id="logged-in-profile" style="display: none; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
+                    <div class="avatar" id="user-avatar">👤</div>
+                    <span class="username" id="username">User</span>
+                </div>
             </div>
         </aside>
 
-
+        <!-- Main Chat Area -->
         <main class="chat-area">
             <header class="chat-header">
-                <h2>6th Tally AI</h2>
                 <button id="menu-toggle" class="menu-toggle">☰</button>
+
+                <div class="header-title">
+                    <h2>Lumy</h2>
+                    <p class="subtitle">a south african AI chatbot designed by 6th tally</p>
+                </div>
+
+                <!-- Right-side actions: Share + Theme toggle -->
+                <div class="header-actions">
+                    <button id="share-btn" class="share-btn" title="Share conversation">Share</button>
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">🌙</button>
+                </div>
             </header>
 
-            <div class="messages-container" id="chat-messages">
-
-            </div>
+            <div class="messages-container" id="chat-messages"></div>
 
             <div class="input-area">
                 <textarea id="user-input" placeholder="Ask me anything..." rows="1"></textarea>
@@ -40,6 +72,9 @@
             </div>
         </main>
     </div>
+
+    <!-- Shooting stars background (only visible in dark mode) -->
+    <div class="stars"></div>
 
     <script src="script.js"></script>
 </body>

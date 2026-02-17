@@ -228,3 +228,70 @@ if (closeSidebar && sidebar) {
         }
     });
 }
+
+// ────────────────────────────────────────────────
+// Dark / Light Mode
+// ────────────────────────────────────────────────
+const themeToggle = document.getElementById('theme-toggle');
+const html = document.documentElement;
+
+function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+const savedTheme = localStorage.getItem('theme') || 'light';
+setTheme(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+    const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+});
+
+// ────────────────────────────────────────────────
+// Shooting Stars (random in dark mode)
+// ────────────────────────────────────────────────
+function createStar() {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    const size = Math.random() * 3 + 1;
+    star.style.width = star.style.height = `${size}px`;
+    star.style.left = `${Math.random() * 100}vw`;
+    star.style.top = `-${size}px`;
+    star.style.animationDuration = `${Math.random() * 6 + 4}s`;
+    star.style.animationDelay = `${Math.random() * 5}s`;
+    document.querySelector('.stars').appendChild(star);
+
+    setTimeout(() => star.remove(), 10000);
+}
+
+setInterval(() => {
+    if (html.getAttribute('data-theme') === 'dark') {
+        createStar();
+    }
+}, 800); // new star every ~0.8s
+
+// ────────────────────────────────────────────────
+// Google Login Placeholder (demo)
+// ────────────────────────────────────────────────
+function handleGoogleLogin(response) {
+    // This is called when user signs in
+    const data = JSON.parse(atob(response.credential.split('.')[1]));
+    document.getElementById('username').textContent = data.name || 'User';
+    document.getElementById('user-avatar').textContent = data.name?.[0] || '👤';
+    // In real app → send token to backend to save user/conversations
+    alert('Logged in as ' + data.name + ' (demo)');
+}
+
+// ────────────────────────────────────────────────
+// Share Conversation (demo - copy current URL)
+// ────────────────────────────────────────────────
+document.getElementById('share-btn').addEventListener('click', () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Conversation link copied! Share it with friends.');
+    }).catch(() => {
+        alert('Copy failed – here is the link: ' + url);
+    });
+});
