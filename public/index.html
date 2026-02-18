@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumy – South African AI</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Google Sign-In SDK -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -15,55 +16,57 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <button id="new-chat-btn" class="new-chat-btn">+ New Chat</button>
-                <button id="close-sidebar" class="close-sidebar">×</button>
+
+                <!-- Close button -->
+                <button id="close-sidebar" class="close-sidebar" aria-label="Close sidebar">
+                    <span class="material-icons">close</span>
+                </button>
             </div>
 
             <div class="chat-history" id="chat-history"></div>
 
-            <!-- Login / User profile at bottom of sidebar -->
-<!-- Sidebar bottom - Login / User profile -->
-<div class="user-profile">
-    <!-- Google Sign-In button - visible when NOT logged in -->
-    <div id="google-signin-container">
-        <div id="g_id_onload"
-             data-client_id="170635490413-hf334d5hkv2l42dqmveh85i711pg4a1m.apps.googleusercontent.com"
-             data-callback="handleGoogleLogin"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin"
-             data-type="standard"
-             data-size="medium"
-             data-theme="outline"
-             data-text="continue_with"
-             data-shape="pill"
-             data-logo_alignment="left">
-        </div>
-    </div>
+            <div class="user-profile">
+                <div id="google-signin-container">
+                    <div id="g_id_onload"
+                         data-client_id="170635490413-hf334d5hkv2l42dqmveh85i711pg4a1m.apps.googleusercontent.com"
+                         data-callback="handleGoogleLogin"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin"
+                         data-type="standard"
+                         data-size="medium"
+                         data-theme="outline"
+                         data-text="continue_with"
+                         data-shape="pill"
+                         data-logo_alignment="left">
+                    </div>
+                </div>
 
-    <!-- Logged-in state - hidden by default -->
-    <div id="logged-in-profile" style="display: none; align-items: center; gap: 10px; width: 100%; justify-content: center;">
-        <div class="avatar" id="user-avatar">👤</div>
-        <span class="logged-in-text">
-            Logged in as <strong id="user-email">user@gmail.com</strong>
-        </span>
-    </div>
-</div>
+                <div id="logged-in-profile" style="display: none; align-items: center; gap: 10px; width: 100%; justify-content: center;">
+                    <div class="avatar" id="user-avatar">👤</div>
+                    <span class="logged-in-text">
+                        Logged in as <strong id="user-email">user@gmail.com</strong>
+                    </span>
+                </div>
+            </div>
         </aside>
 
         <!-- Main Chat Area -->
         <main class="chat-area">
             <header class="chat-header">
-                <button id="menu-toggle" class="menu-toggle">☰</button>
-
+                <button id="menu-toggle" class="menu-toggle" aria-label="Open sidebar">
+                    <span class="material-icons">menu</span>
+                </button>
                 <div class="header-title">
                     <h2>Lumy</h2>
                     <p class="subtitle">a south african AI chatbot designed by 6th tally</p>
                 </div>
 
-                <!-- Right-side actions: Share + Theme toggle -->
                 <div class="header-actions">
                     <button id="share-btn" class="share-btn" title="Share conversation">Share</button>
-                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">🌙</button>
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+                        <span class="material-icons" id="theme-icon">light_mode</span>
+                    </button>
                 </div>
             </header>
 
@@ -76,7 +79,7 @@
         </main>
     </div>
 
-    <!-- Shooting stars background (only visible in dark mode) -->
+    <!-- Shooting stars -->
     <div class="stars"></div>
 
     <script src="script.js"></script>

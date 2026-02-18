@@ -20,6 +20,7 @@
     --bot-text: #202123;
     --sidebar-bg: #202123;
     --sidebar-text: #ececf1;
+    --menu-icon-color: #001f3f; /* Navy blue for light mode */
 }
 
 [data-theme="dark"] {
@@ -36,6 +37,7 @@
     --bot-text: #e0e0ff;
     --sidebar-bg: #111122;
     --sidebar-text: #d0d0ff;
+    --menu-icon-color: white; /* White for dark mode */
 }
 
 body {
@@ -229,6 +231,29 @@ body {
     word-wrap: break-word;
 }
 
+.message {
+    position: relative;
+    margin-bottom: 6px;
+}
+
+.timestamp {
+    font-size: 11px;
+    color: #888;
+    opacity: 0.7;
+    margin-left: 8px;
+    align-self: flex-end;
+    margin-top: 2px;
+}
+
+.message.user .timestamp {
+    color: #fff;
+    opacity: 0.8;
+}
+
+.message.bot .timestamp {
+    color: #666;
+}
+
 .user .message-content {
     background: var(--user-msg);
     color: var(--user-text);
@@ -328,10 +353,21 @@ display: none;
 .theme-toggle {
     background: none;
     border: none;
-    font-size: 22px;
+    font-size: 28px;               /* bigger icon */
     cursor: pointer;
     color: var(--text);
-    padding: 0;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+}
+
+.theme-toggle .material-icons {
+    font-size: 28px;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .material-icons {
+    transform: rotate(15deg);      /* subtle hover animation */
 }
 
 .share-btn {
@@ -369,6 +405,20 @@ display: none;
     .input-area { padding: 12px 16px; }
     .chat-header { padding: 12px 16px; }
     .message { max-width: 90%; }
+    .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Already there, but ensures spacing */
+        padding: 12px 16px;
+    }
+    .header-title {
+        flex: 1;
+        text-align: center;
+        margin: 0 10px; /* Add some space around title */
+    }
+    .menu-toggle {
+        order: -1; /* Ensures it's on the left */
+    }
 }
 
 .sidebar.open ~ .chat-area::before {
@@ -411,3 +461,74 @@ display: none;
 ::-webkit-scrollbar-track { background: var(--border); }
 ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+@media (max-width: 900px) {
+    .chat-header {
+        padding: 12px 16px;
+        justify-content: space-between;
+    }
+
+    .header-title {
+        flex: 1;
+        text-align: center;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+}
+
+/* Menu Toggle (hamburger) */
+.menu-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: none; /* hidden on desktop */
+}
+
+.menu-toggle .material-icons {
+    font-size: 32px;
+    color: var(--menu-icon-color); /* Use the variable */
+}
+
+.menu-toggle:hover {
+    opacity: 0.85;
+}
+
+/* Close Sidebar (X) */
+.close-sidebar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    display: none; /* hidden on desktop */
+    align-self: flex-end;
+}
+
+.close-sidebar .material-icons {
+    font-size: 36px;
+    color: var(--menu-icon-color); /* Use the variable */
+}
+
+.close-sidebar:hover {
+    opacity: 0.85;
+}
+
+/* Mobile view - force show */
+@media (max-width: 900px) {
+    .menu-toggle {
+        display: block !important;
+    }
+
+    .close-sidebar {
+        display: block !important;
+    }
+
+    /* Make sure header has room for icon */
+    .chat-header {
+        padding: 12px 16px;
+        justify-content: space-between;
+        align-items: center;
+    }
+}

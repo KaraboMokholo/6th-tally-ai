@@ -28,7 +28,7 @@ function renderMessages(messages) {
     });
 }
 
-// Append a single message to the UI
+// Append a single message to the UI (with timestamp)
 function appendMessage(text, sender, sources = null) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
@@ -38,8 +38,19 @@ function appendMessage(text, sender, sources = null) {
     contentDiv.textContent = text;
     messageDiv.appendChild(contentDiv);
 
-    if (sources && sources.length > 0 && text.includes('search results') || text.includes('based on') || text.length > 150) {
-    // show sources only when it looks like web-augmented answer
+    // Add timestamp
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-ZA', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+    }).replace(/^0+/, ''); // e.g. "11:42 PM"
+    const timestamp = document.createElement('span');
+    timestamp.classList.add('timestamp');
+    timestamp.textContent = timeString;
+    messageDiv.appendChild(timestamp);
+
+    if (sources && sources.length > 0 && (text.includes('search results') || text.includes('based on') || text.length > 150)) {
         const sourcesDiv = document.createElement('div');
         sourcesDiv.classList.add('sources');
         sourcesDiv.innerHTML = '<strong>Sources:</strong> ';
@@ -59,22 +70,24 @@ function appendMessage(text, sender, sources = null) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Thinking indicator
-let thinkingId = null;
+// Typing indicator ("Lumy is typing...")
 function showThinking() {
     const thinkingDiv = document.createElement('div');
     thinkingDiv.classList.add('message', 'bot');
     thinkingDiv.id = 'thinking-indicator';
-    thinkingDiv.innerHTML = '<div class="message-content thinking"><span>Thinking</span><span class="thinking-dots"></span></div>';
+    thinkingDiv.innerHTML = `
+        <div class="message-content typing">
+            <span>Lumy is typing</span>
+            <span class="typing-dots"></span>
+        </div>
+    `;
     chatMessages.appendChild(thinkingDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    thinkingId = 'thinking-indicator';
 }
 
 function removeThinking() {
     const indicator = document.getElementById('thinking-indicator');
     if (indicator) indicator.remove();
-    thinkingId = null;
 }
 
 // Send message
@@ -82,14 +95,11 @@ async function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
 
-    // Disable input while processing
     userInput.disabled = true;
     sendBtn.disabled = true;
 
-    // Display user message
     appendMessage(message, 'user');
 
-    // Get or create current conversation
     if (!currentConversationId) {
         createNewConversation();
     }
@@ -97,25 +107,22 @@ async function sendMessage() {
     conv.messages.push({ role: 'user', content: message });
 
     userInput.value = '';
-    userInput.style.height = 'auto'; // Reset textarea height
+    userInput.style.height = 'auto';
 
-    // Show thinking indicator
+    // Show typing indicator IMMEDIATELY
     showThinking();
 
     try {
-        // Check cache
         let cached = cache.get(message);
         if (cached) {
-            // Use cached response
             setTimeout(() => {
                 removeThinking();
                 appendMessage(cached.reply, 'bot', cached.sources);
                 conv.messages.push({ role: 'bot', content: cached.reply, sources: cached.sources });
-                updateHistorySidebar(); // Update last message in history
-            }, 500); // Simulate a tiny delay
+                updateHistorySidebar();
+            }, 500);
         } else {
-            // Call backend
-            const response = await fetch('/api/chat', { // Update URL if needed
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message })
@@ -126,7 +133,6 @@ async function sendMessage() {
             const data = await response.json();
             const { reply, sources } = data;
 
-            // Cache it
             cache.set(message, { reply, sources });
 
             removeThinking();
@@ -136,7 +142,7 @@ async function sendMessage() {
         }
     } catch (error) {
         removeThinking();
-        appendMessage('Sorry, I encountered an error. Please try again.', 'bot');
+        appendMessage('Eish, something went wrong. Try again?', 'bot');
         console.error('Error:', error);
     } finally {
         userInput.disabled = false;
@@ -145,7 +151,7 @@ async function sendMessage() {
     }
 }
 
-// Create a new conversation
+// Create a new conversation + auto welcome message
 function createNewConversation() {
     const id = Date.now().toString();
     const newConv = {
@@ -155,7 +161,17 @@ function createNewConversation() {
     };
     conversations.push(newConv);
     currentConversationId = id;
+
     chatMessages.innerHTML = ''; // Clear messages
+
+    // Add welcome message from Lumy
+    const welcomeMsg = {
+        role: 'bot',
+        content: "Sawubona! 👋 I'm Lumy — your South African AI sidekick. How can I help today? (Ask about jobs, news, braai spots, load shedding schedules, or anything else 😄)"
+    };
+    newConv.messages.push(welcomeMsg);
+    appendMessage(welcomeMsg.content, 'bot');
+
     updateHistorySidebar();
 }
 
@@ -163,10 +179,9 @@ function createNewConversation() {
 function updateHistorySidebar() {
     chatHistory.innerHTML = '';
     conversations.forEach(conv => {
-        // Generate title from first user message or default
         const firstUserMsg = conv.messages.find(m => m.role === 'user');
         const title = firstUserMsg ? firstUserMsg.content.substring(0, 30) + (firstUserMsg.content.length > 30 ? '…' : '') : 'New Chat';
-        conv.title = title; // Update title
+        conv.title = title;
 
         const item = document.createElement('div');
         item.classList.add('history-item');
@@ -186,7 +201,7 @@ newChatBtn.addEventListener('click', () => {
 // Send on button click
 sendBtn.addEventListener('click', sendMessage);
 
-// Send on Enter (but allow Shift+Enter for new line)
+// Send on Enter (no Shift)
 userInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -219,7 +234,6 @@ if (closeSidebar && sidebar) {
         sidebar.classList.remove('open');
     });
 
-    // Optional: close when clicking outside
     document.addEventListener('click', (e) => {
         if (sidebar.classList.contains('open') &&
             !sidebar.contains(e.target) &&
@@ -230,22 +244,28 @@ if (closeSidebar && sidebar) {
 }
 
 // ────────────────────────────────────────────────
-// Dark / Light Mode
+// Dark / Light Mode with Material Icons
 // ────────────────────────────────────────────────
 const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
 const html = document.documentElement;
 
 function setTheme(theme) {
     html.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    
+    // Update icon
+    themeIcon.textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
 }
 
+// Load saved theme or default to light
 const savedTheme = localStorage.getItem('theme') || 'light';
 setTheme(savedTheme);
 
+// Toggle on click
 themeToggle.addEventListener('click', () => {
-    const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    const current = html.getAttribute('data-theme') || 'light';
+    const newTheme = current === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
 });
 
@@ -270,40 +290,32 @@ setInterval(() => {
     if (html.getAttribute('data-theme') === 'dark') {
         createStar();
     }
-}, 800); // new star every ~0.8s
+}, 800);
 
 // ────────────────────────────────────────────────
-// Google Login Placeholder (demo)
+// Google Login
 // ────────────────────────────────────────────────
 function handleGoogleLogin(response) {
     try {
         const data = JSON.parse(atob(response.credential.split('.')[1]));
         
-        // Hide Google sign-in button
         document.getElementById('google-signin-container').style.display = 'none';
         
-        // Show logged-in profile with email
         const profile = document.getElementById('logged-in-profile');
         profile.style.display = 'flex';
         
-        // Set name or first letter for avatar
         const name = data.given_name || data.name || 'User';
         document.getElementById('user-avatar').textContent = name.charAt(0) || '👤';
         
-        // Show email
-        const email = data.email || 'user@gmail.com'; // fallback if email not present
+        const email = data.email || 'user@gmail.com';
         document.getElementById('user-email').textContent = email;
         
-        console.log('Logged in as:', name, email);
-        
-        // Optional: save to localStorage so it persists on refresh
         localStorage.setItem('user', JSON.stringify({ name, email }));
     } catch (err) {
         console.error('Google login error:', err);
     }
 }
 
-// Restore login state on page load
 window.addEventListener('load', () => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -316,7 +328,7 @@ window.addEventListener('load', () => {
 });
 
 // ────────────────────────────────────────────────
-// Share Conversation (demo - copy current URL)
+// Share Chat
 // ────────────────────────────────────────────────
 document.getElementById('share-btn').addEventListener('click', () => {
     const url = window.location.href;
