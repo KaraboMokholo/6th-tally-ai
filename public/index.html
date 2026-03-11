@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumy – South African AI</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <!-- PDF.js for client-side PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- Google Sign-In SDK -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body>
     <div class="app">
 
@@ -16,8 +22,6 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <button id="new-chat-btn" class="new-chat-btn">+ New Chat</button>
-
-                <!-- Close button -->
                 <button id="close-sidebar" class="close-sidebar" aria-label="Close sidebar">
                     <span class="material-icons">close</span>
                 </button>
@@ -26,23 +30,23 @@
             <div class="chat-history" id="chat-history"></div>
 
             <div class="user-profile">
+                <!-- Support Button -->
+                <button class="support-btn" id="support-btn">
+                    ❤️ Support Our Project
+                </button>
+
                 <div id="google-signin-container">
                     <div id="g_id_onload"
-                         data-client_id="170635490413-hf334d5hkv2l42dqmveh85i711pg4a1m.apps.googleusercontent.com"
-                         data-callback="handleGoogleLogin"
-                         data-auto_prompt="false">
+                        data-client_id="170635490413-hf334d5hkv2l42dqmveh85i711pg4a1m.apps.googleusercontent.com"
+                        data-callback="handleGoogleLogin" data-auto_prompt="false">
                     </div>
-                    <div class="g_id_signin"
-                         data-type="standard"
-                         data-size="medium"
-                         data-theme="outline"
-                         data-text="continue_with"
-                         data-shape="pill"
-                         data-logo_alignment="left">
+                    <div class="g_id_signin" data-type="standard" data-size="medium" data-theme="outline"
+                        data-text="continue_with" data-shape="pill" data-logo_alignment="left">
                     </div>
                 </div>
 
-                <div id="logged-in-profile" style="display: none; align-items: center; gap: 10px; width: 100%; justify-content: center;">
+                <div id="logged-in-profile"
+                    style="display: none; align-items: center; gap: 10px; width: 100%; justify-content: center;">
                     <div class="avatar" id="user-avatar">👤</div>
                     <span class="logged-in-text">
                         Logged in as <strong id="user-email">user@gmail.com</strong>
@@ -61,7 +65,6 @@
                     <h2>Lumy</h2>
                     <p class="subtitle">a south african AI chatbot designed by 6th tally</p>
                 </div>
-
                 <div class="header-actions">
                     <button id="share-btn" class="share-btn" title="Share conversation">Share</button>
                     <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
@@ -72,8 +75,30 @@
 
             <div class="messages-container" id="chat-messages"></div>
 
+            <!-- Attachment preview -->
+            <div id="attachment-preview" style="display:none;">
+                <div class="attachment-preview-inner">
+                    <img id="preview-img" style="display:none; max-height:140px; border-radius:10px;">
+                    <div id="pdf-preview-label" style="display:none;" class="pdf-preview-label">
+                        <span class="material-icons">picture_as_pdf</span>
+                        <span id="pdf-file-name">document.pdf</span>
+                    </div>
+                    <button id="remove-attachment" class="remove-attachment-btn" title="Remove attachment">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="input-area">
-                <textarea id="user-input" placeholder="Ask me anything..." rows="1"></textarea>
+                <textarea id="user-input" placeholder="Ask me anything... (in any SA language 🇿🇦)"
+                    rows="1"></textarea>
+
+                <!-- File attach button (images + PDFs) -->
+                <label for="file-upload" class="image-upload-btn" title="Attach image or PDF">
+                    <span class="material-icons">attach_file</span>
+                </label>
+                <input type="file" id="file-upload" accept="image/*,.pdf" style="display: none;">
+
                 <button id="send-btn">Send</button>
             </div>
         </main>
@@ -82,6 +107,50 @@
     <!-- Shooting stars -->
     <div class="stars"></div>
 
+    <!-- ── Support Modal ── -->
+    <div class="modal-overlay" id="support-modal-overlay">
+        <div class="support-modal">
+            <button class="modal-close-btn" id="modal-close-btn">
+                <span class="material-icons">close</span>
+            </button>
+            <div class="modal-header">
+                <span class="modal-emoji">❤️</span>
+                <h3>Support Lumy / 6th Tally</h3>
+                <p>We're a small SA team building this for our community. Any amount helps us keep the lights on! 🙏</p>
+            </div>
+            <div class="modal-amount-grid">
+                <button class="amount-btn" data-amount="20">R20</button>
+                <button class="amount-btn" data-amount="50">R50</button>
+                <button class="amount-btn selected" data-amount="100">R100</button>
+                <button class="amount-btn" data-amount="200">R200</button>
+            </div>
+            <input type="number" id="custom-amount" class="custom-amount-input"
+                placeholder="Or enter your own amount (ZAR)" min="5">
+            <div class="modal-actions">
+                <!-- PayFast form (replace merchant_id and merchant_key with yours) -->
+                <form id="payfast-form" action="https://www.payfast.co.za/eng/process" method="POST" target="_blank">
+                    <input type="hidden" name="merchant_id" value="YOUR_PAYFAST_MERCHANT_ID">
+                    <input type="hidden" name="merchant_key" value="YOUR_PAYFAST_MERCHANT_KEY">
+                    <input type="hidden" name="return_url" value="https://lumy.6thtally.co.za/thanks">
+                    <input type="hidden" name="cancel_url" value="https://lumy.6thtally.co.za">
+                    <input type="hidden" name="item_name" value="Support Lumy by 6th Tally">
+                    <input type="hidden" name="amount" id="payfast-amount" value="100.00">
+                    <button type="submit" class="payfast-btn">
+                        💳 Pay with PayFast (SA)
+                    </button>
+                </form>
+
+                <!-- PayPal for international -->
+                <a href="https://www.paypal.com/donate?business=YOUR_PAYPAL_EMAIL&amount=10&currency_code=USD&item_name=Support+Lumy+6th+Tally"
+                    target="_blank" class="paypal-btn">
+                    🌍 PayPal (International)
+                </a>
+            </div>
+            <p class="modal-note">* Replace PayFast & PayPal details with your own in the HTML</p>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
+
 </html>
